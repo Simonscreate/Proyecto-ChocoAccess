@@ -133,14 +133,15 @@ class Movimiento {
      * Analítica 3: Datos crudos de accesos diarios generales para calcular Media, Mediana y Moda
      */
     public function obtenerFrecuenciasAccesosDiarios() {
-        // Cuenta cuántos accesos de entrada ocurren por día en toda la planta
-        $query = "SELECT DATE(timestamp_registro) AS fecha, COUNT(*) AS conteo 
-                FROM movimientos 
-                WHERE tipo_movimiento = 'ENTRADA'
-                GROUP BY DATE(timestamp_registro)
-                ORDER BY conteo ASC"; // Ordenado para facilitar la mediana
-        $stmt = $this->conn->prepare($query);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_COLUMN); // Devuelve un array plano de números [2, 5, 5, 8, 12...]
-    }
+    // Al colocar el COUNT(*) al principio, PDO::FETCH_COLUMN extraerá los números
+    $query = "SELECT COUNT(*) AS conteo, DATE(timestamp_registro) AS fecha 
+              FROM movimientos 
+              WHERE tipo_movimiento = 'ENTRADA'
+              GROUP BY DATE(timestamp_registro)
+              ORDER BY conteo ASC"; // Mantiene el orden ascendente para la mediana
+              
+    $stmt = $this->conn->prepare($query);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_COLUMN); // Ahora sí devolverá un array de enteros: [2, 5, 8...]
+}
 }
