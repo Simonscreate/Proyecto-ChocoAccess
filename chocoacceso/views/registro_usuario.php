@@ -12,7 +12,7 @@ include "../includes/navbar.php";
 <head>
     <meta charset="UTF-8">
     <title>ChocoAcceso - Gestión de Personal</title>
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/styleV.css">
 </head>
 <body>
 

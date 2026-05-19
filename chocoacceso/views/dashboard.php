@@ -13,7 +13,7 @@ $personalEnPlanta = $mov->consultarUbicacionesActuales($filtro);
 <head>
     <meta charset="UTF-8">
     <title>ChocoAcceso - Monitor Pro</title>
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/styleV.css">
 </head>
 <body>
 
