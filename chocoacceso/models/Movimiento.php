@@ -116,15 +116,17 @@ class Movimiento {
     }
 
     /**
-     * Analítica 2: Veces que un usuario específico ha accedido a los departamentos (Histórico)
+     * Analítica 2: Veces que un usuario ha accedido a las áreas filtrado por su CÉDULA
      */
-    public function obtenerAccesosPorUsuario($id_usuario) {
-        $query = "SELECT observaciones AS departamento, COUNT(*) AS accesos 
-                FROM movimientos 
-                WHERE id_usuario = :id_usuario AND tipo_movimiento = 'ENTRADA'
-                GROUP BY observaciones";
+    public function obtenerAccesosPorCedula($cedula) {
+        $query = "SELECT m.observaciones AS departamento, COUNT(*) AS accesos 
+                FROM movimientos m
+                JOIN usuarios u ON m.id_usuario = u.id_usuario
+                WHERE u.cedula = :cedula AND m.tipo_movimiento = 'ENTRADA'
+                GROUP BY m.observaciones";
+                
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(":id_usuario", $id_usuario);
+        $stmt->bindParam(":cedula", $cedula);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -143,5 +145,78 @@ class Movimiento {
     $stmt = $this->conn->prepare($query);
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_COLUMN); // Ahora sí devolverá un array de enteros: [2, 5, 8...]
-}
+    }
+    /**
+     * Analítica Avanzada: Obtener frecuencias agrupadas por intervalo de tiempo o espacio (departamento)
+     * para el cálculo de Media, Mediana y Moda.
+     */
+    public function obtenerFrecuenciasAnaliticas($intervalo) {
+        switch ($intervalo) {
+            case 'hora':
+                $formato_sql = "DATE_FORMAT(timestamp_registro, '%H')";
+                break;
+            case 'mes':
+                $formato_sql = "DATE_FORMAT(timestamp_registro, '%Y-%m')";
+                break;
+            case 'anio':
+                $formato_sql = "DATE_FORMAT(timestamp_registro, '%Y')";
+                break;
+            case 'depto':
+                // NUEVO CASO: Agrupa directamente por el string del departamento/área
+                $formato_sql = "observaciones";
+                break;
+            case 'dia':
+            default:
+                $formato_sql = "DATE(timestamp_registro)";
+                break;
+        }
+
+        // Se mantiene la estructura SQL ordenada ascendentemente (obligatorio para la Mediana)
+        $query = "SELECT COUNT(*) AS conteo, " . $formato_sql . " AS periodo 
+                FROM movimientos 
+                WHERE tipo_movimiento = 'ENTRADA'
+                GROUP BY " . $formato_sql . "
+                ORDER BY conteo ASC";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_COLUMN); // Devuelve el array numérico de frecuencias [5, 5, 12...]
+    }
+    /**
+     * NUEVO: Obtener específicamente el o los nombres de los departamentos más visitados (Moda Espacial)
+     */
+    public function obtenerDepartamentoModa() {
+        $query = "SELECT observaciones AS departamento, COUNT(*) AS conteo 
+                FROM movimientos 
+                WHERE tipo_movimiento = 'ENTRADA'
+                GROUP BY observaciones 
+                HAVING conteo = (
+                    SELECT COUNT(*) AS max_conteo 
+                    FROM movimientos 
+                    WHERE tipo_movimiento = 'ENTRADA' 
+                    GROUP BY observaciones 
+                    ORDER BY max_conteo DESC LIMIT 1
+                )";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        $resultados = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        if (count($resultados) > 0) {
+            // Validamos si todos los departamentos tienen el mismo conteo (distribución uniforme = no hay moda)
+            $query_total = "SELECT COUNT(DISTINCT observaciones) FROM movimientos WHERE tipo_movimiento = 'ENTRADA'";
+            $stmt_total = $this->conn->prepare($query_total);
+            $stmt_total->execute();
+            $total_deptos = $stmt_total->fetchColumn();
+            
+            if (count($resultados) == $total_deptos && $total_deptos > 1) {
+                return "No hay moda (Tráfico uniforme)";
+            }
+
+            $nombres = array_map(function($item) {
+                return $item['departamento'] . " (" . $item['conteo'] . " de m.)";
+            }, $resultados);
+            return implode(", ", $nombres);
+        }
+        return "No definida";
+    }
 }

@@ -6,15 +6,17 @@ $rol = $_SESSION['rol'] ?? null;
 ?>
 
 <nav class="main-navbar">
-    <div class="nav-brand">ChocoAcceso</div>
+    <div class="nav-brand"><a href="index.php">Choco Acceso</div>
     <ul class="nav-links">
         <li><a href="login.php">Portería</a></li>
         <li><a href="dashboard.php">Monitor</a></li>
-
+        <li><a href="estadisticas.php">Graficos</a></li>
         <?php if ($rol): ?>
             <?php if (in_array($rol, ['Administrador', 'Gerencia', 'Operador_Seguridad'])): ?>
                 <li><a href="registro_usuario.php">Registrar Personal</a></li>
                 <li><a href="auditoria.php">Auditoría</a></li>
+                <li><a href="calendario.php">Citas</a></li>
+                <li><a href="gestion_inicio.php">Singlepage</a></li>
             <?php endif; ?>
 
             <li class="nav-auth">

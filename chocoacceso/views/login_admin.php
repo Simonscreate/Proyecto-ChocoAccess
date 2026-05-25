@@ -1,5 +1,4 @@
 <?php include "../includes/navbar.php"; ?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>

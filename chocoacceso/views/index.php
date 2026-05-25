@@ -1,3 +1,13 @@
+<?php
+
+
+require_once "../config/Database.php";
+require_once "../models/Landing.php";
+
+$db = (new Database())->Conexion();
+$landing = new Landing($db);
+$landing_data = $landing->obtenerTodoContenido();
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -64,7 +74,7 @@
                     <img src="../img/iconsession.png" alt="">
                 </div>
                 <div class="ps-3">
-                    <small class="text-primary mb-0"><a href="login.php">Chocoacceso</a></small>
+                    <small class="text-primary mb-0"><a href="login_admin.php">Chocoacceso</a></small>
                     <p class="text-light fs-5 mb-0">Registrar/Iniciar</p>
                 </div>
             </div>
@@ -77,14 +87,14 @@
     <div class="container-fluid p-0 pb-5 wow fadeIn" data-wow-delay="0.1s">
         <div class="owl-carousel header-carousel position-relative">
             <div class="owl-carousel-item position-relative">
-                <img class="img-fluid" src="img/Carrusel1.jpg" alt="">
+                <img class="img-fluid" src="<?php echo $landing_data['carrusel_1']['imagen_url']; ?>" alt="">
                 <div class="owl-carousel-inner">
                     <div class="container">
                         <div class="row justify-content-start">
                             <div class="col-lg-8">
-                                <p class="text-primary text-uppercase fw-bold mb-2">// El Mejor Chocolate</p>
-                                <h1 class="display-1 text-light mb-4 animated slideInDown">Comprometidos con nuestra vision</h1>
-                                <p class="text-light fs-5 mb-4 pb-3">Calidad garantizada.</p>
+                                <p class="text-primary text-uppercase fw-bold mb-2"><?php echo htmlspecialchars($landing_data['carrusel_1']['contenido']); ?></p>
+                                <h1 class="display-1 text-light mb-4 animated slideInDown"><?php echo htmlspecialchars($landing_data['carrusel_1']['titulo']); ?></h1>
+                                <p class="text-light fs-5 mb-4 pb-3"><?php echo htmlspecialchars($landing_data['carrusel_1']['subtitulo']); ?></p>
                                 <a href="" class="btn btn-primary rounded-pill py-3 px-5">Leer mas</a>
                             </div>
                         </div>
@@ -92,14 +102,14 @@
                 </div>
             </div>
             <div class="owl-carousel-item position-relative">
-                <img class="img-fluid" src="img/Carrusel2.jpg" alt="">
+                <img class="img-fluid" src="<?php echo $landing_data['carrusel_2']['imagen_url']; ?>" alt="">
                 <div class="owl-carousel-inner">
                     <div class="container">
                         <div class="row justify-content-start">
                             <div class="col-lg-8">
-                                <p class="text-primary text-uppercase fw-bold mb-2">// Calidad</p>
-                                <h1 class="display-1 text-light mb-4 animated slideInDown">Excelencia Cacaotera desde 1929</h1>
-                                <p class="text-light fs-5 mb-4 pb-3">Transformando el mejor cacao de Venezuela en chocolate de categoría mundial, ahora con procesos digitales de última generación.</p>
+                                <p class="text-primary text-uppercase fw-bold mb-2"><?php echo htmlspecialchars($landing_data['carrusel_2']['contenido']); ?></p>
+                                <h1 class="display-1 text-light mb-4 animated slideInDown"><?php echo htmlspecialchars($landing_data['carrusel_2']['titulo']); ?></h1>
+                                <p class="text-light fs-5 mb-4 pb-3"><?php echo htmlspecialchars($landing_data['carrusel_2']['subtitulo']); ?></p>
                                 <a href="" class="btn btn-primary rounded-pill py-3 px-5">Leer mas</a>
                             </div>
                         </div>
@@ -165,10 +175,9 @@
                 </div>
                 <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.5s">
                     <div class="h-100">
-                        <p class="text-primary text-uppercase mb-2">// Sobre Nosotros</p>
-                        <h1 class="display-6 mb-4">Innovación en el Corazón de Barquisimeto</h1>
-                        <p>En Chocolates El Rey, nuestra planta en el estado Lara no solo procesa el aroma y sabor de nuestra tierra, sino que evoluciona hacia la Industria 4.0. Entendemos que la calidad de nuestro chocolate comienza con la seguridad y el control de nuestros procesos internos.</p>
-                        <div class="row g-2 mb-4">
+                        <p class="text-primary text-uppercase mb-2"><?php echo htmlspecialchars($landing_data['sobre_nosotros']['contenido']); ?></p>
+                        <h1 class="display-6 mb-4"><?php echo htmlspecialchars($landing_data['sobre_nosotros']['titulo']); ?></h1>
+                        <p><?php echo htmlspecialchars($landing_data['sobre_nosotros']['subtitulo'] ?? $landing_data['sobre_nosotros']['contenido']); ?></p>                        <div class="row g-2 mb-4">
                             <div class="col-sm-6">
                                 <i class="fa fa-check text-primary me-2"></i>Calidad de Productos
                             </div>
